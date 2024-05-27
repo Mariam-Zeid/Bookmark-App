@@ -1,0 +1,140 @@
+body {
+  min-height: 100vh;
+  background: #001524;
+  color: #f5f5f5;
+  font-family: "Open Sans", sans-serif;
+  transition: all 0.2s;
+}
+
+.container {
+  max-width: 600px;
+}
+
+/* ? ========== Website Heading ========== */
+.wavy {
+  position: relative;
+  -webkit-box-reflect: below -12px linear-gradient(transparent, rgba(247, 236, 222, 0.2));
+}
+.wavy span {
+  position: relative;
+  display: inline-block;
+  color: #f5f5f5;
+  font-size: 2.7em;
+  animation: animate 1.5s ease-in-out infinite;
+  animation-delay: calc(0.1s * var(--i));
+}
+@keyframes animate {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  20% {
+    transform: translateY(-20px);
+  }
+  40% {
+    transform: translateY(0px);
+  }
+}
+
+/* ? ========== Form ========== */
+.form-container {
+  margin: 0 auto;
+  background: #0076b65e;
+  box-shadow: 0 30px 40px rgba(0, 0, 0, 0.4);
+}
+.bookmark-form input {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #f5f5f5 !important;
+  border: none;
+  outline: none;
+}
+.bookmark-form input::placeholder {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+.bookmark-form input:focus {
+  background-color: rgba(245, 245, 245, 0.4);
+}
+.form-btn {
+  color: #f5f5f5;
+  background: #0077b6;
+  transition: all 0.1s ease-out;
+}
+.form-btn:hover {
+  /* filter: brightness(0.9);
+  -webkit-filter: brightness(0.9); */
+  background: rgba(0, 119, 182, 0.7);
+}
+
+/* ? ========== Alert Modal ========== */
+.alert-modal {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.9));
+}
+.modal-container {
+  width: 500px;
+  z-index: 10;
+}
+@media screen and (max-width: 600px) {
+  .modal-container {
+    width: 300px;
+  }
+}
+.alert-message {
+  color: #434e65;
+}
+.modal-icon {
+  font-size: 2rem;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border-width: 2px;
+  border-style: solid;
+}
+.warning-icon {
+  color: orange;
+  border-color: orange;
+}
+.success-icon {
+  color: green;
+  border-color: green;
+}
+.error-icon {
+  color: red;
+  border-color: red;
+}
+
+/* ? ========== Bookmarks ========== */
+.nolink {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 2.5rem;
+  font-weight: bold;
+  user-select: none;
+}
+
+.nolink-icon i {
+  font-size: 5rem;
+  cursor: auto;
+}
+
+.bookmark-site {
+  background: #0076b65e;
+  box-shadow: 0 30px 40px rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+  word-break: break-all;
+}
+.site-action a,
+.site-action i {
+  color: inherit;
+  transition: all 0.5s ease;
+}
+.site-action a:hover,
+.site-action i:hover {
+  color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-3.5px);
+}
+
+.site-action a:hover,
+.site-action i:active {
+  transform: translateY(0px);
+}
