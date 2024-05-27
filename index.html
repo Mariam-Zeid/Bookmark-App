@@ -56,7 +56,7 @@
 
     <!-- ?================ Form ================ -->
     <div class="form-container py-4 px-3 d-flex flex-column gap-4">
-      <form class="bookmark-form d-flex flex-column gap-4">
+      <form class="bookmark-form d-flex flex-column gap-4" id="bookmarkForm">
         <div class="site-link">
           <input id="siteTitle" type="text" class="form-control" placeholder="Site Title">
         </div>
@@ -68,8 +68,8 @@
             id="siteDescription">
         </div>
       </form>
-      <button id="addSite" class="btn form-btn w-100">Save</button>
-      <button id="updateSite" class="btn form-btn w-100 d-none">Update</button>
+      <button id="addBookmark" class="btn form-btn w-100">Save</button>
+      <button id="updateBookmark" class="btn form-btn w-100 d-none">Update</button>
     </div>
 
     <!-- ?================ Alert Modals ================ -->
@@ -81,15 +81,14 @@
     <div class="bookmarks-container">
 
       <!-- ? ========= in case no link in there =========  -->
-      <div class="nolink" id="emptySiteList">
+      <div class="nolink" id="emptyBookmarkListList">
         <div class="nolink-icon mt-5">
           <i class="fas fa-ghost"></i>
         </div>
         <p class="nolink-message mb-0">Empty list</p>
       </div>
       <!-- ?================ Bookmarks list ================ -->
-      <div class="row g-4 mt-5" id="bookmarkList">
-
+      <div class="row g-4 mt-5 d-none" id="bookmarkList">
       </div>
     </div>
   </div>
