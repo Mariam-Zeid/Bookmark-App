@@ -6,7 +6,7 @@ let siteTitleInput = document.querySelector("#siteTitle");
 let siteUrlInput = document.querySelector("#siteUrl");
 let siteDescriptionInput = document.querySelector("#siteDescription");
 const addBookmarkBtn = document.querySelector("#addBookmark");
-const updateBookmark = document.querySelector("#updateBookmark");
+const updateBookmarkBtn = document.querySelector("#updateBookmark");
 
 const ghostContainer = document.querySelector("#emptyBookmarkListList");
 const bookmarkListContainer = document.getElementById("bookmarkList");
@@ -14,19 +14,13 @@ const bookmarkListContainer = document.getElementById("bookmarkList");
 const alertContainer = document.getElementById("alert");
 
 let bookmarksList = [];
+let currentBookmarkIndex;
 
 // ?================================= Functions =================================?
 const setLocalStorage = () => {
   localStorage.setItem("bookmarksList", JSON.stringify(bookmarksList));
 };
-const getLocalStorage = () => {
-  const data = JSON.parse(localStorage.getItem("bookmarksList"));
-  if (!data) return;
-  bookmarksList = data;
-
-  // Retrieve list from local storage
-  bookmarksList.forEach(addBookmark);
-};
+const getLocalStorage = () => JSON.parse(localStorage.getItem("bookmarksList"));
 
 const toggleGhost = () => {
   const shouldShowBookmarks = bookmarksList.length !== 0;
@@ -97,9 +91,8 @@ const capitalizeSiteTitle = (siteTitle) => {
 
 const renderBookmarks = () => {
   bookmarkListContainer.innerHTML = "";
-  bookmarksList.forEach(addBookmark);
+  bookmarksList.forEach((bookmark) => addBookmark(bookmark));
   toggleGhost();
-  getLocalStorage();
 };
 const addBookmark = (bookmark) => {
   const html = `
@@ -111,14 +104,13 @@ const addBookmark = (bookmark) => {
             </div>
             <div class="site-action d-flex align-items-center gap-3">
               <a><i class="fa-solid fa-link"></i></a>
-              <i class="fa-solid fa-pen"></i>
+              <i class="fa-solid fa-pen edit-bookmark"></i>
               <i class="fa-solid fa-trash delete-bookmark"></i>
             </div>
           </div>
         </div>
   `;
   bookmarkListContainer.insertAdjacentHTML("beforeend", html);
-  toggleGhost();
 };
 
 // ?================================= Events =================================?
@@ -133,13 +125,42 @@ addBookmarkBtn.addEventListener("click", () => {
     siteDesc: siteDescriptionInput.value,
   };
   bookmarksList.push(bookmark);
-  setLocalStorage();
   form.reset();
   renderBookmarks();
-  displayAlert("success", "check", "Your bookmark has been added", "Done");
+  setLocalStorage();
+  displayAlert(
+    "success",
+    "check",
+    "Your bookmark has been added Successfully",
+    "Done"
+  );
 });
+updateBookmarkBtn.addEventListener("click", () => {
+  const siteTitle = capitalizeSiteTitle(siteTitleInput.value);
+  let updatedSite = {
+    siteTitle,
+    siteUrl: siteUrlInput.value,
+    siteDesc: siteDescriptionInput.value,
+  };
+  bookmarksList[currentBookmarkIndex] = updatedSite;
+  console.log(bookmarksList);
+  form.reset();
+  // setLocalStorage();
+  renderBookmarks();
+  setLocalStorage();
+  displayAlert(
+    "success",
+    "check",
+    "Your bookmark has been updated Successfully",
+    "Done"
+  );
+  updateBookmarkBtn.classList.add("d-none");
+  addBookmarkBtn.classList.remove("d-none");
+});
+
 // ! Event delegation for handling delete bookmark button clicks
 bookmarkListContainer.addEventListener("click", (e) => {
+  // delete bookmark
   if (e.target.classList.contains("delete-bookmark")) {
     const bookmarkSite = e.target.closest(".bookmark-site");
     const index = Array.from(bookmarkListContainer.children).indexOf(
@@ -149,7 +170,23 @@ bookmarkListContainer.addEventListener("click", (e) => {
     renderBookmarks();
     displayAlert("success", "check", "Your bookmark has been deleted", "Done");
   }
+
+  // update bookmark
+  if (e.target.classList.contains("edit-bookmark")) {
+    const bookmarkSite = e.target.closest(".bookmark-site");
+    currentBookmarkIndex = Array.from(bookmarkListContainer.children).indexOf(
+      bookmarkSite.parentElement
+    );
+    siteTitleInput.value = bookmarksList[currentBookmarkIndex].siteTitle;
+    siteUrlInput.value = bookmarksList[currentBookmarkIndex].siteUrl;
+    siteDescriptionInput.value = bookmarksList[currentBookmarkIndex].siteDesc;
+
+    updateBookmarkBtn.classList.remove("d-none");
+    addBookmarkBtn.classList.add("d-none");
+  }
 });
 
 // ?================================= Init =================================?
+
+bookmarksList = getLocalStorage() ?? bookmarksList;
 renderBookmarks();
