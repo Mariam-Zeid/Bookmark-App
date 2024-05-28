@@ -16,11 +16,55 @@ const alertContainer = document.getElementById("alert");
 let bookmarksList = [];
 let currentBookmarkIndex;
 
+let isTitleValid;
+let isUrlValidation;
+
 // ?================================= Functions =================================?
 const setLocalStorage = () => {
   localStorage.setItem("bookmarksList", JSON.stringify(bookmarksList));
 };
 const getLocalStorage = () => JSON.parse(localStorage.getItem("bookmarksList"));
+const siteTitleValidator = () => {
+  const titlePattern = /^[a-zA-Z]{4,}(?: [a-zA-Z]+){0,2}$/;
+  const siteTitle = siteTitleInput.value.trim();
+  isTitleValid = titlePattern.test(siteTitle) ? true : false;
+  console.log(isTitleValid);
+  return isTitleValid;
+};
+const siteUrlValidator = () => {
+  const urlPattern =
+    /^(https?|ftp):\/\/www\.[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+(\/[^\/]*)*$/;
+  let siteURL = siteUrlInput.value.trim();
+  // Make https:// optional if not provided
+  if (!siteURL.startsWith("https://") || !siteURL.startsWith("http://")) {
+    siteURL = `https://${siteURL}`;
+    siteUrlInput.value = siteURL;
+  }
+  isUrlValidation = urlPattern.test(siteURL) ? true : false;
+  console.log(isUrlValidation);
+  return isUrlValidation;
+};
+
+const submitForm = (bookmark) => {
+  if (!bookmark.siteTitle && !bookmark.siteURL) {
+    displayAlert(
+      "warning",
+      "exclamation",
+      "All fields must be completed",
+      "try again"
+    );
+    return false;
+  } else if (isTitleValid && !isUrlValidation) {
+    displayAlert("error", "x", "Please enter a valid URL", "try again");
+    console.log("url bayz");
+    return false;
+  } else if (!isTitleValid && isUrlValidation) {
+    displayAlert("error", "x", "Please enter a valid title", "try again");
+    console.log("title bayz");
+    return false;
+  }
+  return true;
+};
 
 const toggleGhost = () => {
   const shouldShowBookmarks = bookmarksList.length !== 0;
@@ -70,24 +114,6 @@ const capitalizeSiteTitle = (siteTitle) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
-// displayAlert(
-//   "warning",
-//   "exclamation",
-//   "All fields must be completed",
-//   "try again"
-// );
-// displayAlert(
-//   "error",
-//   "x",
-//   "Something went wrong. Please try again...",
-//   "try again"
-// );
-// displayAlert(
-//   "error",
-//   "x",
-//   "Ensure all fields are filled correctly",
-//   "try again"
-// );
 
 const renderBookmarks = () => {
   bookmarkListContainer.innerHTML = "";
@@ -103,7 +129,7 @@ const addBookmark = (bookmark) => {
               <p class="bookmark-desc">${bookmark.siteDesc}</p>
             </div>
             <div class="site-action d-flex align-items-center gap-3">
-              <a><i class="fa-solid fa-link"></i></a>
+              <a><i class="fa-solid fa-link visit-site"></i></a>
               <i class="fa-solid fa-pen edit-bookmark"></i>
               <i class="fa-solid fa-trash delete-bookmark"></i>
             </div>
@@ -124,16 +150,19 @@ addBookmarkBtn.addEventListener("click", () => {
     siteUrl: siteUrlInput.value,
     siteDesc: siteDescriptionInput.value,
   };
-  bookmarksList.push(bookmark);
-  form.reset();
-  renderBookmarks();
-  setLocalStorage();
-  displayAlert(
-    "success",
-    "check",
-    "Your bookmark has been added Successfully",
-    "Done"
-  );
+
+  if (submitForm(bookmark)) {
+    bookmarksList.push(bookmark);
+    form.reset();
+    renderBookmarks();
+    setLocalStorage();
+    displayAlert(
+      "success",
+      "check",
+      "Your bookmark has been added Successfully",
+      "Done"
+    );
+  }
 });
 updateBookmarkBtn.addEventListener("click", () => {
   const siteTitle = capitalizeSiteTitle(siteTitleInput.value);
@@ -142,33 +171,36 @@ updateBookmarkBtn.addEventListener("click", () => {
     siteUrl: siteUrlInput.value,
     siteDesc: siteDescriptionInput.value,
   };
-  bookmarksList[currentBookmarkIndex] = updatedSite;
-  console.log(bookmarksList);
-  form.reset();
-  // setLocalStorage();
-  renderBookmarks();
-  setLocalStorage();
-  displayAlert(
-    "success",
-    "check",
-    "Your bookmark has been updated Successfully",
-    "Done"
-  );
-  updateBookmarkBtn.classList.add("d-none");
-  addBookmarkBtn.classList.remove("d-none");
+  if (submitForm(updatedSite)) {
+    bookmarksList[currentBookmarkIndex] = updatedSite;
+    console.log(bookmarksList);
+    form.reset();
+    // setLocalStorage();
+    renderBookmarks();
+    setLocalStorage();
+    displayAlert(
+      "success",
+      "check",
+      "Your bookmark has been updated Successfully",
+      "Done"
+    );
+    updateBookmarkBtn.classList.add("d-none");
+    addBookmarkBtn.classList.remove("d-none");
+  }
 });
+siteTitleInput.addEventListener("change", siteTitleValidator);
+siteUrlInput.addEventListener("change", siteUrlValidator);
 
 // ! Event delegation for handling delete bookmark button clicks
 bookmarkListContainer.addEventListener("click", (e) => {
-  // delete bookmark
-  if (e.target.classList.contains("delete-bookmark")) {
+  // Visit site
+  if (e.target.classList.contains("visit-site")) {
     const bookmarkSite = e.target.closest(".bookmark-site");
-    const index = Array.from(bookmarkListContainer.children).indexOf(
+    currentBookmarkIndex = Array.from(bookmarkListContainer.children).indexOf(
       bookmarkSite.parentElement
     );
-    bookmarksList.splice(index, 1);
-    renderBookmarks();
-    displayAlert("success", "check", "Your bookmark has been deleted", "Done");
+    let sitePath = bookmarksList[currentBookmarkIndex].siteUrl;
+    window.open(sitePath, "_blank");
   }
 
   // update bookmark
@@ -183,6 +215,18 @@ bookmarkListContainer.addEventListener("click", (e) => {
 
     updateBookmarkBtn.classList.remove("d-none");
     addBookmarkBtn.classList.add("d-none");
+  }
+
+  // delete bookmark
+  if (e.target.classList.contains("delete-bookmark")) {
+    const bookmarkSite = e.target.closest(".bookmark-site");
+    currentBookmarkIndex = Array.from(bookmarkListContainer.children).indexOf(
+      bookmarkSite.parentElement
+    );
+    bookmarksList.splice(currentBookmarkIndex, 1);
+    renderBookmarks();
+    setLocalStorage();
+    displayAlert("success", "check", "Your bookmark has been deleted", "Done");
   }
 });
 
