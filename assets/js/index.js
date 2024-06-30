@@ -17,7 +17,7 @@ let bookmarksList = [];
 let currentBookmarkIndex;
 
 let isTitleValid;
-let isUrlValidation;
+let isUrlValid;
 
 // ?================================= Functions =================================?
 const setLocalStorage = () => {
@@ -28,25 +28,24 @@ const siteTitleValidator = () => {
   const titlePattern = /^[a-zA-Z]{4,}(?: [a-zA-Z]+){0,2}$/;
   const siteTitle = siteTitleInput.value.trim();
   isTitleValid = titlePattern.test(siteTitle) ? true : false;
-  console.log(isTitleValid);
   return isTitleValid;
 };
 const siteUrlValidator = () => {
   const urlPattern =
     /^(https?|ftp):\/\/www\.[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+(\/[^\/]*)*$/;
   let siteURL = siteUrlInput.value.trim();
-  // Make https:// optional if not provided
-  if (!siteURL.startsWith("https://") || !siteURL.startsWith("http://")) {
+  if (!siteURL.startsWith("https://") && !siteURL.startsWith("http://")) {
     siteURL = `https://${siteURL}`;
     siteUrlInput.value = siteURL;
   }
-  isUrlValidation = urlPattern.test(siteURL) ? true : false;
-  console.log(isUrlValidation);
-  return isUrlValidation;
+  isUrlValid = urlPattern.test(siteURL) ? true : false;
+  return isUrlValid;
 };
 
 const submitForm = (bookmark) => {
-  if (!bookmark.siteTitle && !bookmark.siteURL) {
+  const isTitleEmpty = bookmark.siteTitle === "";
+  const isUrlEmpty = bookmark.siteUrl === "";
+  if (isTitleEmpty || isUrlEmpty) {
     displayAlert(
       "warning",
       "exclamation",
@@ -54,13 +53,17 @@ const submitForm = (bookmark) => {
       "try again"
     );
     return false;
-  } else if (isTitleValid && !isUrlValidation) {
+  }
+  if (isTitleValid && !isUrlValid) {
     displayAlert("error", "x", "Please enter a valid URL", "try again");
-    console.log("url bayz");
     return false;
-  } else if (!isTitleValid && isUrlValidation) {
+  }
+  if (!isTitleValid && isUrlValid) {
     displayAlert("error", "x", "Please enter a valid title", "try again");
-    console.log("title bayz");
+    return false;
+  }
+  if (!isTitleValid && !isUrlValid) {
+    displayAlert("error", "x", "Enter a valid Title and URL", "try again");
     return false;
   }
   return true;
@@ -142,6 +145,8 @@ const addBookmark = (bookmark) => {
 // ?================================= Events =================================?
 form.addEventListener("submit", (e) => {
   e.preventDefault();
+  // clear form
+  form.reset();
 });
 addBookmarkBtn.addEventListener("click", () => {
   const siteTitle = capitalizeSiteTitle(siteTitleInput.value);
@@ -171,11 +176,13 @@ updateBookmarkBtn.addEventListener("click", () => {
     siteUrl: siteUrlInput.value,
     siteDesc: siteDescriptionInput.value,
   };
+
+  console.log(bookmarksList);
+  console.log(currentBookmarkIndex);
   if (submitForm(updatedSite)) {
     bookmarksList[currentBookmarkIndex] = updatedSite;
     console.log(bookmarksList);
     form.reset();
-    // setLocalStorage();
     renderBookmarks();
     setLocalStorage();
     displayAlert(
@@ -186,6 +193,8 @@ updateBookmarkBtn.addEventListener("click", () => {
     );
     updateBookmarkBtn.classList.add("d-none");
     addBookmarkBtn.classList.remove("d-none");
+
+    console.log(siteUrl);
   }
 });
 siteTitleInput.addEventListener("change", siteTitleValidator);
@@ -212,7 +221,6 @@ bookmarkListContainer.addEventListener("click", (e) => {
     siteTitleInput.value = bookmarksList[currentBookmarkIndex].siteTitle;
     siteUrlInput.value = bookmarksList[currentBookmarkIndex].siteUrl;
     siteDescriptionInput.value = bookmarksList[currentBookmarkIndex].siteDesc;
-
     updateBookmarkBtn.classList.remove("d-none");
     addBookmarkBtn.classList.add("d-none");
   }
