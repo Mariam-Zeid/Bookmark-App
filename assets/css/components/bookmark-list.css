@@ -1,0 +1,72 @@
+.empty-list {
+  margin-top: 3.75rem;
+}
+.empty-list,
+.nolink {
+  text-align: center;
+  color: #ffffff9c;
+  font-size: 2.5rem;
+  font-weight: bold;
+  user-select: none;
+}
+
+.empty-list .ghost-icon,
+.nolink-icon i {
+  font-size: 4.5rem;
+  cursor: auto;
+}
+
+.bookmark-site {
+  background: linear-gradient(145deg, #0077b6, #023e8a);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.site-title {
+  font-weight: 600;
+  color: #f8f9fa;
+  margin-bottom: 5px;
+}
+
+.bookmark-desc {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.site-action {
+  flex-shrink: 0;
+}
+
+.site-action a,
+.site-action i {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.site-action a:hover,
+.site-action i:hover {
+  color: #f8f9fa;
+  transform: translateY(-3px);
+}
+
+.site-action a:active,
+.site-action i:active {
+  transform: translateY(0);
+}
+
+/* ? ========== Media Queries ========== */
+@media screen and (min-width: 768px) {
+  .empty-list,
+  .nolink {
+    font-size: 2.5rem;
+  }
+  .empty-list .ghost-icon,
+  .nolink-icon i {
+    font-size: 5rem;
+  }
+}

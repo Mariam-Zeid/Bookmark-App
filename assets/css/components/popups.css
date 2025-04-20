@@ -1,0 +1,86 @@
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 99;
+}
+.popup-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+.popup-body {
+  width: 90%;
+  max-width: 500px;
+  border-radius: 15px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  transform: translateY(30px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.popup-overlay.show .popup-body {
+  transform: translateY(0);
+  opacity: 1;
+}
+.popup-icon {
+  font-size: 1.5rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border-width: 3px;
+  border-style: solid;
+  animation: pulseIcon 1.5s infinite;
+}
+@keyframes pulseIcon {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.success-icon {
+  color: #28a745;
+  border-color: #28a745;
+}
+.warning-icon {
+  color: #ffc107;
+  border-color: #ffc107;
+}
+.error-icon {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+.popup-message {
+  color: #495057;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+.popup-btn {
+  border-radius: 50px;
+  padding: 10px 30px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.popup-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 768px) {
+  .popup-icon {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+  }
+}

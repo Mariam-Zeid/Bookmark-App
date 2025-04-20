@@ -1,0 +1,25 @@
+.search-box {
+  width: 300px;
+}
+.search-box input,
+.search-box input:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-color);
+}
+.search-box input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+.add-site-btn, .add-site-btn:hover {
+  background: #00749b;
+  color: var(--text-color);
+}
+
+.add-site-btn i {
+  font-size: 1.2rem;
+}
+
+@media screen and (min-width: 768px) {
+  .search-box {
+    width: 400px;
+  }
+}

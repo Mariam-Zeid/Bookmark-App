@@ -1,244 +1,257 @@
-"use strict";
-
-// ?================================= Variables =================================?
-const form = document.querySelector("#bookmarkForm");
-let siteTitleInput = document.querySelector("#siteTitle");
-let siteUrlInput = document.querySelector("#siteUrl");
-let siteDescriptionInput = document.querySelector("#siteDescription");
-const addBookmarkBtn = document.querySelector("#addBookmark");
-const updateBookmarkBtn = document.querySelector("#updateBookmark");
-
-const ghostContainer = document.querySelector("#emptyBookmarkListList");
-const bookmarkListContainer = document.getElementById("bookmarkList");
-
-const alertContainer = document.getElementById("alert");
-
-let bookmarksList = [];
-let currentBookmarkIndex;
-
-let isTitleValid;
-let isUrlValid;
-
-// ?================================= Functions =================================?
-const setLocalStorage = () => {
-  localStorage.setItem("bookmarksList", JSON.stringify(bookmarksList));
-};
-const getLocalStorage = () => JSON.parse(localStorage.getItem("bookmarksList"));
-const siteTitleValidator = () => {
-  const titlePattern = /^[a-zA-Z]{4,}(?: [a-zA-Z]+){0,2}$/;
-  const siteTitle = siteTitleInput.value.trim();
-  isTitleValid = titlePattern.test(siteTitle) ? true : false;
-  return isTitleValid;
-};
-const siteUrlValidator = () => {
-  const urlPattern =
-    /^(https?|ftp):\/\/www\.[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+(\/[^\/]*)*$/;
-  let siteURL = siteUrlInput.value.trim();
-  if (!siteURL.startsWith("https://") && !siteURL.startsWith("http://")) {
-    siteURL = `https://${siteURL}`;
-    siteUrlInput.value = siteURL;
-  }
-  isUrlValid = urlPattern.test(siteURL) ? true : false;
-  return isUrlValid;
+// ? ================ Variables ================
+const APP_CONFIG = {
+  storageKey: "bookmarksList",
+  validation: {
+    title: /^[a-zA-Z]{4,}(?: [a-zA-Z]+){0,2}$/,
+    url: /^(https?|ftp):\/\/www\.[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+(\/[^\/]*)*$/,
+  },
+  popups: {
+    success: {
+      icon: "fa-check",
+      type: "success",
+      title: "Great!",
+    },
+    warning: {
+      icon: "fa-exclamation",
+      type: "warning",
+      title: "Warning",
+    },
+    error: {
+      icon: "fa-x",
+      type: "danger",
+      title: "Ooops!",
+    },
+  },
 };
 
-const submitForm = (bookmark) => {
-  const isTitleEmpty = bookmark.siteTitle === "";
-  const isUrlEmpty = bookmark.siteUrl === "";
-  if (isTitleEmpty || isUrlEmpty) {
-    displayAlert(
-      "warning",
-      "exclamation",
-      "All fields must be completed",
-      "try again"
-    );
-    return false;
-  }
-  if (isTitleValid && !isUrlValid) {
-    displayAlert("error", "x", "Please enter a valid URL", "try again");
-    return false;
-  }
-  if (!isTitleValid && isUrlValid) {
-    displayAlert("error", "x", "Please enter a valid title", "try again");
-    return false;
-  }
-  if (!isTitleValid && !isUrlValid) {
-    displayAlert("error", "x", "Enter a valid Title and URL", "try again");
-    return false;
-  }
-  return true;
+const ui = {
+  form: {
+    popup: document.getElementById("formPopup"),
+    element: document.getElementById("bookmarkForm"),
+    title: document.getElementById("formTitle"),
+    submitBtn: document.getElementById("submitFormBtn"),
+    inputs: {
+      title: document.getElementById("siteTitle"),
+      url: document.getElementById("siteUrl"),
+      description: document.getElementById("siteDescription"),
+    },
+    buttons: {
+      open: document.getElementById("openFormBtn"),
+      close: document.getElementById("closeFormBtn"),
+    },
+  },
+  searchInput: document.getElementById("searchInput"),
+  bookmarks: {
+    container: document.getElementById("list"),
+    emptySiteList: document.getElementById("emptySiteList"),
+    emptyListText: document.getElementById("emptyListText"),
+  },
+  popups: {
+    popup: document.getElementById("popup"),
+    icon: document.getElementById("popupIcon"),
+    title: document.getElementById("popupTitle"),
+    message: document.getElementById("popupMessage"),
+    closeBtn: document.getElementById("popupCloseBtn"),
+  },
 };
 
-const toggleGhost = () => {
-  const shouldShowBookmarks = bookmarksList.length !== 0;
-  ghostContainer.classList.toggle("d-none", shouldShowBookmarks);
-  bookmarkListContainer.classList.toggle("d-none", !shouldShowBookmarks);
-  bookmarkListContainer.classList.toggle("d-flex", shouldShowBookmarks);
-};
-const toggleAlert = () => {
-  alertContainer.classList.toggle("d-none");
-  // Toggle 'd-flex' class based on the presence of 'd-none'
-  alertContainer.classList.toggle(
-    "d-flex",
-    !alertContainer.classList.contains("d-none")
-  );
-};
-const addAlertBtn = () => {
-  document.querySelector(".alert-btn").addEventListener("click", toggleAlert);
-};
-const displayAlert = (alert, alertIcon, alertMessage, alertBtn) => {
-  const html = `
-      <div class="modal-container bg-white p-4 rounded-2 shadow-lg text-center">
-        <div class="error-icon-box d-flex justify-content-center mb-4">
-          <i class="fa-solid fa-${alertIcon} modal-icon ${alert}-icon d-flex align-items-center justify-content-center"></i>
-        </div>
-        <div class="modal-content">
-          <h3 class="alert-heading text-${
-            alert === "error" ? "danger" : alert
-          } text-capitalize">${alert}</h3>
-          <p class="alert-message">${alertMessage}</p>
-          <button class="btn btn-${
-            alert === "error" ? "danger" : alert
-          } w-50 mx-auto alert-btn">${alertBtn}</button>
-        </div>
-      </div>
-  `;
-  toggleAlert();
-  alertContainer.innerHTML = html;
-  if (alertContainer.children.length > 0) {
-    addAlertBtn();
-  }
-};
-const capitalizeSiteTitle = (siteTitle) => {
-  return siteTitle
-    .trim()
-    .toLowerCase()
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-};
+// ? ================ Functions ================
 
-const renderBookmarks = () => {
-  bookmarkListContainer.innerHTML = "";
-  bookmarksList.forEach((bookmark) => addBookmark(bookmark));
-  toggleGhost();
-};
-const addBookmark = (bookmark) => {
-  const html = `
-    <div class="col-12">
-          <div class="bookmark-site p-3 mx-auto d-flex align-items-center justify-content-between gap-4">
-            <div class="site-info">
-              <h4 class="site-title">${bookmark.siteTitle}</h4> 
-              <p class="bookmark-desc">${bookmark.siteDesc}</p>
-            </div>
-            <div class="site-action d-flex align-items-center gap-3">
-              <a><i class="fa-solid fa-link visit-site"></i></a>
-              <i class="fa-solid fa-pen edit-bookmark"></i>
-              <i class="fa-solid fa-trash delete-bookmark"></i>
-            </div>
+// Local Storage
+const loadBookmarks = () =>
+  JSON.parse(localStorage.getItem(APP_CONFIG.storageKey)) || [];
+const saveBookmarks = () =>
+  localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(bookmarks));
+
+const bookmarks = loadBookmarks();
+
+// UI
+const createBookmarkHTML = (bookmark, index) => {
+  return `
+      <div class="col-lg-7 col-12">
+        <div class="bookmark-site p-3 mx-auto d-flex align-items-center justify-content-between gap-4" data-index="${index}">
+          <div class="site-info">
+            <h4 class="site-title">${bookmark.title}</h4>
+            <p class="bookmark-desc">${
+              bookmark.description || "No description provided"
+            }</p>
+          </div>
+          <div class="site-action d-flex align-items-center gap-3">
+            <i class="visit-site-btn fa-solid fa-link" data-url="${
+              bookmark.url
+            }"></i>
+            <i class="edit-site-btn fa-solid fa-pen"></i>
+            <i class="delete-site-btn fa-solid fa-trash"></i>
           </div>
         </div>
-  `;
-  bookmarkListContainer.insertAdjacentHTML("beforeend", html);
+      </div>`;
+};
+const renderBookmarks = () => {
+  if (bookmarks.length === 0) {
+    ui.bookmarks.emptySiteList.classList.remove("d-none");
+    ui.bookmarks.container.classList.add("d-none");
+    return;
+  }
+  ui.bookmarks.emptySiteList.classList.add("d-none");
+  ui.bookmarks.container.classList.remove("d-none");
+  ui.bookmarks.container.innerHTML = bookmarks
+    .map((bookmark, index) => createBookmarkHTML(bookmark, index))
+    .join("");
+};
+const matchedBookmarks = () => {
+  const searchVal = ui.searchInput.value.toLowerCase().trim();
+  
+  if (searchVal === "") {
+    renderBookmarks();
+    ui.bookmarks.emptyListText.innerText = "Empty list";
+    return;
+  }
+
+  const filtered = bookmarks.filter((bookmark) =>
+    bookmark.title.toLowerCase().includes(searchVal)
+  );
+
+  if (filtered.length === 0) {
+    ui.bookmarks.emptySiteList.classList.remove("d-none");
+    ui.bookmarks.container.classList.add("d-none");
+    ui.bookmarks.emptyListText.innerText = "No Matched Bookmark";
+  } else {
+    ui.bookmarks.emptySiteList.classList.add("d-none");
+    ui.bookmarks.container.classList.remove("d-none");
+    ui.bookmarks.container.innerHTML = filtered
+      .map((bookmark, index) => createBookmarkHTML(bookmark, index))
+      .join("");
+  }
 };
 
-// ?================================= Events =================================?
-form.addEventListener("submit", (e) => {
+
+// Popups
+const showPopup = (type, message) => {
+  ui.popups.popup.classList.add("show");
+
+  ui.popups.icon.classList.add(APP_CONFIG.popups[type].icon, `${type}-icon`);
+
+  ui.popups.title.innerText = APP_CONFIG.popups[type].title;
+  ui.popups.title.classList.add(`text-${APP_CONFIG.popups[type].type}`);
+
+  ui.popups.message.textContent = message;
+
+  ui.popups.closeBtn.textContent = type === "success" ? "Done" : "Try again";
+  ui.popups.closeBtn.classList.add(`btn-${APP_CONFIG.popups[type].type}`);
+
+  console.log("popup generated");
+};
+const hidePopup = () => {
+  ui.popups.popup.classList.remove("show");
+};
+
+// Form
+const openForm = (mode = "add", bookmark = null) => {
+  ui.form.popup.classList.add("show");
+  ui.form.title.textContent =
+    mode === "add" ? "Add Bookmark" : "Update Bookmark";
+  ui.form.submitBtn.textContent = mode === "add" ? "Add" : "Update";
+  ui.form.element.dataset.mode = mode;
+
+  if (bookmark) {
+    ui.form.inputs.title.value = bookmark.title;
+    ui.form.inputs.url.value = bookmark.url;
+    ui.form.inputs.description.value = bookmark.description || "";
+    ui.form.element.dataset.editIndex = bookmark.index;
+  }
+};
+const closeForm = () => {
+  ui.form.popup.classList.remove("show");
+  ui.form.element.reset();
+  delete ui.form.element.dataset.editIndex;
+};
+const handleSubmit = (e) => {
   e.preventDefault();
-  // clear form
-  form.reset();
-});
-addBookmarkBtn.addEventListener("click", () => {
-  const siteTitle = capitalizeSiteTitle(siteTitleInput.value);
-  let bookmark = {
-    siteTitle,
-    siteUrl: siteUrlInput.value,
-    siteDesc: siteDescriptionInput.value,
+  const formData = {
+    title: ui.form.inputs.title.value,
+    url: ui.form.inputs.url.value,
+    description: ui.form.inputs.description.value || "No description provided",
   };
+  const editIndex = ui.form.element.dataset.editIndex;
+  const success = editIndex
+    ? updateBookmark(parseInt(editIndex), formData)
+    : addBookmark(formData);
 
-  if (submitForm(bookmark)) {
-    bookmarksList.push(bookmark);
-    form.reset();
+  if (success) {
+    closeForm();
+    saveBookmarks();
     renderBookmarks();
-    setLocalStorage();
-    displayAlert(
-      "success",
-      "check",
-      "Your bookmark has been added Successfully",
-      "Done"
-    );
   }
-});
-updateBookmarkBtn.addEventListener("click", () => {
-  const siteTitle = capitalizeSiteTitle(siteTitleInput.value);
-  let updatedSite = {
-    siteTitle,
-    siteUrl: siteUrlInput.value,
-    siteDesc: siteDescriptionInput.value,
+};
+
+// Validations
+const validateBookmark = (data) => {
+  if (!data.title || !data.url) {
+    showPopup("warning", "Please fill in all required fields");
+    return false;
+  }
+
+  if (!APP_CONFIG.validation.title.test(data.title.trim())) {
+    showPopup("error", "Invalid title format");
+    return false;
+  }
+
+  if (!APP_CONFIG.validation.url.test(formatUrl(data.url))) {
+    showPopup("error", "Invalid URL format");
+    return false;
+  }
+
+  return true;
+};
+const formatUrl = (url) => {
+  return url.startsWith("http") ? url : `https://${url}`;
+};
+
+// event delegation for bookmark actions
+const handleBookmarkClick = (e) => {
+  const bookmarkEl = e.target.closest(".bookmark-site");
+  if (!bookmarkEl) return;
+  const index = parseInt(bookmarkEl.dataset.index);
+  if (e.target.classList.contains("visit-site-btn")) {
+    window.open(e.target.dataset.url, "_blank");
+  } else if (e.target.classList.contains("edit-site-btn")) {
+    openForm("edit", { ...bookmarks[index], index });
+  } else if (e.target.classList.contains("delete-site-btn")) {
+    deleteBookmark(index);
+    saveBookmarks();
+    renderBookmarks();
+    showPopup("success", "Bookmark deleted successfully!");
+  }
+};
+const addBookmark = (data) => {
+  if (!validateBookmark(data)) return false;
+  bookmarks.push({
+    ...data,
+    url: formatUrl(data.url),
+  });
+  showPopup("success", "Bookmark added successfully!");
+  return true;
+};
+const updateBookmark = (index, data) => {
+  if (!validateBookmark(data)) return false;
+  bookmarks[index] = {
+    ...data,
+    url: formatUrl(data.url),
   };
+  showPopup("success", "Bookmark updated successfully!");
+  return true;
+};
+const deleteBookmark = (index) => {
+  bookmarks.splice(index, 1);
+  saveBookmarks();
+};
 
-  console.log(bookmarksList);
-  console.log(currentBookmarkIndex);
-  if (submitForm(updatedSite)) {
-    bookmarksList[currentBookmarkIndex] = updatedSite;
-    console.log(bookmarksList);
-    form.reset();
-    renderBookmarks();
-    setLocalStorage();
-    displayAlert(
-      "success",
-      "check",
-      "Your bookmark has been updated Successfully",
-      "Done"
-    );
-    updateBookmarkBtn.classList.add("d-none");
-    addBookmarkBtn.classList.remove("d-none");
-
-    console.log(siteUrl);
-  }
-});
-siteTitleInput.addEventListener("change", siteTitleValidator);
-siteUrlInput.addEventListener("change", siteUrlValidator);
-
-// ! Event delegation for handling delete bookmark button clicks
-bookmarkListContainer.addEventListener("click", (e) => {
-  // Visit site
-  if (e.target.classList.contains("visit-site")) {
-    const bookmarkSite = e.target.closest(".bookmark-site");
-    currentBookmarkIndex = Array.from(bookmarkListContainer.children).indexOf(
-      bookmarkSite.parentElement
-    );
-    let sitePath = bookmarksList[currentBookmarkIndex].siteUrl;
-    window.open(sitePath, "_blank");
-  }
-
-  // update bookmark
-  if (e.target.classList.contains("edit-bookmark")) {
-    const bookmarkSite = e.target.closest(".bookmark-site");
-    currentBookmarkIndex = Array.from(bookmarkListContainer.children).indexOf(
-      bookmarkSite.parentElement
-    );
-    siteTitleInput.value = bookmarksList[currentBookmarkIndex].siteTitle;
-    siteUrlInput.value = bookmarksList[currentBookmarkIndex].siteUrl;
-    siteDescriptionInput.value = bookmarksList[currentBookmarkIndex].siteDesc;
-    updateBookmarkBtn.classList.remove("d-none");
-    addBookmarkBtn.classList.add("d-none");
-  }
-
-  // delete bookmark
-  if (e.target.classList.contains("delete-bookmark")) {
-    const bookmarkSite = e.target.closest(".bookmark-site");
-    currentBookmarkIndex = Array.from(bookmarkListContainer.children).indexOf(
-      bookmarkSite.parentElement
-    );
-    bookmarksList.splice(currentBookmarkIndex, 1);
-    renderBookmarks();
-    setLocalStorage();
-    displayAlert("success", "check", "Your bookmark has been deleted", "Done");
-  }
-});
-
-// ?================================= Init =================================?
-
-bookmarksList = getLocalStorage() ?? bookmarksList;
 renderBookmarks();
+
+// ? ================ Events ================
+ui.form.buttons.open.addEventListener("click", () => openForm("add"));
+ui.form.buttons.close.addEventListener("click", () => closeForm());
+ui.form.element.addEventListener("submit", (e) => handleSubmit(e));
+ui.searchInput.addEventListener("input", matchedBookmarks);
+ui.popups.closeBtn.addEventListener("click", hidePopup);
+ui.bookmarks.container.addEventListener("click", (e) => handleBookmarkClick(e));

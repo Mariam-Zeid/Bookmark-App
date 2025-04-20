@@ -1,0 +1,28 @@
+.wavy {
+  position: relative;
+  margin: 20px 0;
+  /* -webkit-box-reflect: below -12px linear-gradient(transparent, rgba(247, 236, 222, 0.2)); */
+}
+
+.wavy span {
+  position: relative;
+  display: inline-block;
+  color: #f8f9fa;
+  font-size: 3em;
+  font-weight: 700;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+  animation: animate 1.5s ease-in-out infinite;
+  animation-delay: calc(0.1s * var(--i));
+}
+
+@keyframes animate {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  20% {
+    transform: translateY(-20px);
+  }
+  40% {
+    transform: translateY(0px);
+  }
+}

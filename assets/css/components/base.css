@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
+:root {
+  --dark-blue: #001233;
+  --light-blue: #023E8A;
+  --text-color: #f8f9fa;
+  --grayish-white:#f5f5f5;
+}
+
+body {
+  color: var(--text-color);
+  min-height: 100vh;
+  background: linear-gradient(135deg, #001233, #023E8A);
+  font-family: "Nunito", sans-serif;
+}
+
+input {
+  box-shadow: none !important;
+  border: none !important;
+  color: var(--text-color) !important;
+}
