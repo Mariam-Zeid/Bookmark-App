@@ -1,10 +1,46 @@
-#formPopup .popup-body {
-  background: linear-gradient(145deg, #023e8a, #0077b6);
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 99;
 }
+
+.popup-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.popup-body {
+  width: 90%;
+  max-width: 500px;
+  border-radius: 15px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  transform: translateY(30px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.popup-overlay.show .popup-body {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#formPopup .popup-body {
+  background: linear-gradient(var(--form-gradient));
+}
+
 .form-title {
   color: var(--text-color);
   font-weight: 600;
 }
+
 .btn-close {
   background-color: transparent;
   color: var(--text-color);
@@ -15,37 +51,51 @@
   transition: all 0.3s ease;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e");
 }
+
 .btn-close:focus {
   box-shadow: none;
 }
+
 .btn-close:hover {
   opacity: 1;
 }
-.bookmark-form input {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #f8f9fa;
-  border: none;
+
+.bookmark-form input,
+.bookmark-form input:focus {
+  background-color: var(--grayish-white-1);
+  color: var(--text-color);
   border-radius: 8px;
   padding: 12px 15px;
   transition: all 0.3s ease;
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
+
+.bookmark-form input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-color);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .bookmark-form input::placeholder {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--grayish-white-2);
 }
-.bookmark-form input:focus {
-  background-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 0 0 3px rgba(0, 150, 199, 0.3);
+
+.bookmark-form .errMsg {
+  color: var(--error-text);
 }
+
 .form-btn {
-  color: #f8f9fa;
-  background: #00b4d8;
+  color: var(--text-color);
+  background-color: var(--blue-btn);
   border-radius: 8px;
   padding: 12px;
   font-weight: 600;
   transition: all 0.3s ease;
 }
+
 .form-btn:hover {
-  background: #0096c7;
+  background-color: var(--blue-btn);
   transform: translateY(-2px);
 }

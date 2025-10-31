@@ -1,21 +1,33 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
 
 :root {
-  --dark-blue: #001233;
-  --light-blue: #023E8A;
   --text-color: #f8f9fa;
-  --grayish-white:#f5f5f5;
+  --grayish-white-1: #ffffff26;
+  --grayish-white-2: #ffffff99;
+  --error-text: #ff6b6b;
+  --blue-btn: #0096c7;
+  --body-gradient: 135deg, #001233, #023E8A;
+  --form-gradient: 145deg, #023e8a, #0077b6;
+  --bookmark-gradient: 145deg, #0077b6, #023e8a;
 }
 
 body {
   color: var(--text-color);
   min-height: 100vh;
-  background: linear-gradient(135deg, #001233, #023E8A);
+  background: linear-gradient(var(--body-gradient));
   font-family: "Nunito", sans-serif;
 }
 
 input {
-  box-shadow: none !important;
-  border: none !important;
-  color: var(--text-color) !important;
+  box-shadow: none;
+  border: none;
+  color: var(--text-color);
+}
+
+p {
+  margin: 0;
+}
+
+::selection {
+  background-color: var(--blue-2);
 }

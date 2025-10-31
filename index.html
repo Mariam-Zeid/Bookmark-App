@@ -21,6 +21,13 @@
       referrerpolicy="no-referrer"
     />
 
+    <!-- ?================ Toastify CSS ================ -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+
     <!-- ?================ Main CSS File ================ -->
     <link rel="stylesheet" href="assets/css/all.css" />
 
@@ -138,31 +145,12 @@
         </div>
       </div>
     </main>
-    <!-- ?================ Popups ================ -->
-    <div id="popup" class="popup-overlay">
-      <div class="popup-body bg-white p-4 rounded-2 shadow-lg text-center">
-        <div class="icon-box d-flex justify-content-center mb-4">
-          <i
-            id="popupIcon"
-            class="fa-solid fa-check popup-icon d-flex align-items-center justify-content-center"
-          ></i>
-        </div>
-        <h3 id="popupTitle" class="popup-heading text-success"></h3>
-        <p id="popupMessage" class="popup-message"></p>
-        <button
-          id="popupCloseBtn"
-          class="btn btn-success w-50 mx-auto popup-btn"
-        ></button>
-      </div>
-    </div>
 
-    <!-- ?================ Bootstrap JS ================ -->
+    <!-- ?================ Toastify JS ================ -->
     <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
     ></script>
-
     <!-- ?================ Main JS File ================ -->
     <script src="assets/js/index.js"></script>
   </body>
